@@ -120,6 +120,20 @@ export const AuthProvider = ({ children }) => {
   const loginWithEmail = async (email, password) => {
     try {
       setError(null);
+      
+      // Demo credentials bypass
+      if (email === 'demo@example.com' && password === 'demo123') {
+        const demoUser = {
+          uid: 'demo-user-123',
+          email: 'demo@example.com',
+          displayName: 'Demo User',
+          photoURL: null,
+          providerData: [{ providerId: 'demo' }]
+        };
+        setUser(demoUser);
+        return demoUser;
+      }
+      
       const result = await signInWithEmail(email, password);
       return result.user;
     } catch (err) {

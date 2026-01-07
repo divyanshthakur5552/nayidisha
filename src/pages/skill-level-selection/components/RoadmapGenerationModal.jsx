@@ -81,23 +81,32 @@ const RoadmapGenerationModal = ({
           return;
         }
 
-        // Check if roadmap already exists
+        // Check if this is a demo user (skip Supabase for demo)
+        const isDemoUser = user.uid === 'demo-user-123';
+
+        // Check if roadmap already exists (skip for demo user)
         setCurrentStep(0);
         setProgress(10);
         
-        const existingProgress = await userService.getProgress(user.uid);
-        
-        if (existingProgress && existingProgress.roadmap) {
-          // Roadmap already exists, use it instead of generating new one
-          setExistingRoadmap(existingProgress.roadmap);
-          setProgress(100);
-          setCurrentStep(generationSteps.length - 1);
-          
-          setTimeout(() => {
-            setIsGenerating(false);
-            onComplete(existingProgress.roadmap);
-          }, 1000);
-          return;
+        if (!isDemoUser) {
+          try {
+            const existingProgress = await userService.getProgress(user.uid);
+            
+            if (existingProgress && existingProgress.roadmap) {
+              // Roadmap already exists, use it instead of generating new one
+              setExistingRoadmap(existingProgress.roadmap);
+              setProgress(100);
+              setCurrentStep(generationSteps.length - 1);
+              
+              setTimeout(() => {
+                setIsGenerating(false);
+                onComplete(existingProgress.roadmap);
+              }, 1000);
+              return;
+            }
+          } catch (err) {
+            console.log('No existing progress found, generating new roadmap');
+          }
         }
 
         // Start visual progress animation for new roadmap generation
@@ -128,13 +137,19 @@ const RoadmapGenerationModal = ({
         setGeneratedRoadmap(roadmapData);
         setProgress(70);
 
-        // Save roadmap to database with initialized progress
-        await userService.saveRoadmap(user.uid, roadmapData, {
-          subject: userSelections?.subject,
-          goal: userSelections?.goal,
-          skillLevel: userSelections?.skillLevel,
-          selectedSubjects: [userSelections?.subject]
-        });
+        // Save roadmap to database with initialized progress (skip for demo user)
+        if (!isDemoUser) {
+          try {
+            await userService.saveRoadmap(user.uid, roadmapData, {
+              subject: userSelections?.subject,
+              goal: userSelections?.goal,
+              skillLevel: userSelections?.skillLevel,
+              selectedSubjects: [userSelections?.subject]
+            });
+          } catch (err) {
+            console.log('Could not save roadmap to database:', err.message);
+          }
+        }
         
         setProgress(75);
 

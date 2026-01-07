@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../contexts/AuthContext';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../../contexts/AuthContext";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { 
+  const {
     user,
     loading: authLoading,
-    loginWithGoogle, 
-    loginWithEmail, 
-    signupWithEmail, 
+    loginWithGoogle,
+    loginWithEmail,
+    signupWithEmail,
     forgotPassword,
-    error: authError 
+    error: authError,
   } = useAuth();
 
-  const [mode, setMode] = useState('login'); // 'login', 'signup', 'forgot'
+  const [mode, setMode] = useState("login"); // 'login', 'signup', 'forgot'
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const from = location.state?.from?.pathname || '/goal-selection';
+  const from = location.state?.from?.pathname || "/subject-selection";
   const [hasRedirected, setHasRedirected] = React.useState(false);
 
   // Redirect authenticated users
@@ -57,30 +57,30 @@ const AuthPage = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    setError("");
   };
 
   const validateForm = () => {
-    if (mode === 'signup') {
+    if (mode === "signup") {
       if (!formData.name.trim()) {
-        setError('Name is required');
+        setError("Name is required");
         return false;
       }
       if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
+        setError("Passwords do not match");
         return false;
       }
       if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters');
+        setError("Password must be at least 6 characters");
         return false;
       }
     }
     if (!formData.email.trim()) {
-      setError('Email is required');
+      setError("Email is required");
       return false;
     }
-    if (mode !== 'forgot' && !formData.password.trim()) {
-      setError('Password is required');
+    if (mode !== "forgot" && !formData.password.trim()) {
+      setError("Password is required");
       return false;
     }
     return true;
@@ -91,23 +91,23 @@ const AuthPage = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    setError('');
-    setMessage('');
+    setError("");
+    setMessage("");
 
     try {
-      if (mode === 'login') {
+      if (mode === "login") {
         await loginWithEmail(formData.email, formData.password);
         navigate(from, { replace: true });
-      } else if (mode === 'signup') {
+      } else if (mode === "signup") {
         await signupWithEmail(formData.email, formData.password, formData.name);
         navigate(from, { replace: true });
-      } else if (mode === 'forgot') {
+      } else if (mode === "forgot") {
         await forgotPassword(formData.email);
-        setMessage('Password reset email sent! Check your inbox.');
-        setFormData({ ...formData, email: '' });
+        setMessage("Password reset email sent! Check your inbox.");
+        setFormData({ ...formData, email: "" });
       }
     } catch (err) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -115,22 +115,22 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       // This will redirect to Google
       await loginWithGoogle();
       // User will be redirected back and handled by AuthContext
     } catch (err) {
-      setError(err.message || 'Failed to login with Google');
+      setError(err.message || "Failed to login with Google");
       setLoading(false);
     }
   };
 
   const switchMode = (newMode) => {
     setMode(newMode);
-    setError('');
-    setMessage('');
-    setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+    setError("");
+    setMessage("");
+    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
   };
 
   return (
@@ -153,9 +153,9 @@ const AuthPage = () => {
               Nayi Disha
             </motion.h1>
             <p className="text-gray-400 mt-2">
-              {mode === 'login' && 'Welcome back! Sign in to continue'}
-              {mode === 'signup' && 'Create your account to get started'}
-              {mode === 'forgot' && 'Reset your password'}
+              {mode === "login" && "Welcome back! Sign in to continue"}
+              {mode === "signup" && "Create your account to get started"}
+              {mode === "forgot" && "Reset your password"}
             </p>
           </div>
 
@@ -185,7 +185,7 @@ const AuthPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Full Name
@@ -217,7 +217,7 @@ const AuthPage = () => {
               />
             </div>
 
-            {mode !== 'forgot' && (
+            {mode !== "forgot" && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Password
@@ -234,7 +234,7 @@ const AuthPage = () => {
               </div>
             )}
 
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Confirm Password
@@ -251,11 +251,11 @@ const AuthPage = () => {
               </div>
             )}
 
-            {mode === 'login' && (
+            {mode === "login" && (
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => switchMode('forgot')}
+                  onClick={() => switchMode("forgot")}
                   className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
                 >
                   Forgot password?
@@ -269,21 +269,37 @@ const AuthPage = () => {
               loading={loading}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold"
             >
-              {mode === 'login' && 'Sign In'}
-              {mode === 'signup' && 'Create Account'}
-              {mode === 'forgot' && 'Send Reset Link'}
+              {mode === "login" && "Sign In"}
+              {mode === "signup" && "Create Account"}
+              {mode === "forgot" && "Send Reset Link"}
             </Button>
+
+            {mode === "login" && (
+              <Button
+                type="button"
+                fullWidth
+                variant="outline"
+                onClick={() => {
+                  setFormData({ ...formData, email: "demo@example.com", password: "demo123" });
+                }}
+                className="mt-3 border-green-500/50 text-green-400 hover:bg-green-500/10"
+              >
+                Use Demo Credentials
+              </Button>
+            )}
           </form>
 
           {/* Divider */}
-          {mode !== 'forgot' && (
+          {mode !== "forgot" && (
             <>
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-900/50 text-gray-400">Or continue with</span>
+                  <span className="px-2 bg-gray-900/50 text-gray-400">
+                    Or continue with
+                  </span>
                 </div>
               </div>
 
@@ -321,36 +337,36 @@ const AuthPage = () => {
 
           {/* Switch Mode */}
           <div className="mt-6 text-center text-sm text-gray-400">
-            {mode === 'login' && (
+            {mode === "login" && (
               <>
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => switchMode('signup')}
+                  onClick={() => switchMode("signup")}
                   className="text-purple-400 hover:text-purple-300 font-medium"
                 >
                   Sign up
                 </button>
               </>
             )}
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <>
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => switchMode('login')}
+                  onClick={() => switchMode("login")}
                   className="text-purple-400 hover:text-purple-300 font-medium"
                 >
                   Sign in
                 </button>
               </>
             )}
-            {mode === 'forgot' && (
+            {mode === "forgot" && (
               <>
-                Remember your password?{' '}
+                Remember your password?{" "}
                 <button
                   type="button"
-                  onClick={() => switchMode('login')}
+                  onClick={() => switchMode("login")}
                   className="text-purple-400 hover:text-purple-300 font-medium"
                 >
                   Sign in
@@ -363,7 +379,7 @@ const AuthPage = () => {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
           >
             ← Back to Home
